@@ -1,5 +1,5 @@
 from flask_restful import Resource, reqparse
-from models import HotelModel
+from models import HotelModel, SiteModel
 from flask_jwt_extended import jwt_required
 import sqlite3
 from .filter import normalize_path_args, query_with_city, query_without_city
@@ -42,7 +42,8 @@ class Hotels(Resource):
                 'name': line[1],
                 'stars': line[2],
                 'daily': line[3],
-                'city': line[4]
+                'city': line[4],
+                'site_id': line[5]
             }
 
             )
@@ -69,8 +70,10 @@ class Hotel(Resource):
         if HotelModel.find_hotel(hotel_id):
             return {'message': f'Hotel {hotel_id} already exists.'}, 400
         data = self.args.parse_args()
-        print(data)
         hotel = HotelModel(hotel_id, **data)
+
+        if not SiteModel.find_by_id(data.get("site_id")):
+            return {"message": "The site id associeted doesn't exist"}
         try:
             hotel.save_hotel()
         except:

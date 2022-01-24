@@ -31,6 +31,7 @@ class Site(Resource):
 
     def delete(self, url: str) -> tuple[dict[str: str], int]:
         site = SiteModel.find_site(url=url)
+
         if site:
             try:
                 site.delete_site()
